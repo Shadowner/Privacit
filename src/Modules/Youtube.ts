@@ -1,9 +1,11 @@
 import { wrapTextWithFactCheck } from "../core/FactChecker";
+import { SentimentAnalysis } from "../core/SentimentAnalysis";
 import { hashString } from "../helper/hashString";
 import { PageContent } from "../interfaces/ContentData";
 export class YTBModule {
     private static markedSponsorised: number[] = [];
     private static factedTweets: number[] = [];
+    private static seenContents: number[] = [];
 
     public static extractElement(): PageContent[] {
         // <div id="body" class="ytd-comment-view-model">
@@ -41,7 +43,7 @@ export class YTBModule {
         }
     }
 
-    public static filterYtb(filterList: string[], ytb: PageContent) {
+    public static async filterYtb(filterList: string[], ytb: PageContent) {
         if (filterList.length === 0) {
             console.log("No filter list provided");
             return;
@@ -87,6 +89,65 @@ export class YTBModule {
                 return;
             }
         }
+        if (this.seenContents.includes(ytb.smartHash)) {
+            return
+        }
+        this.seenContents.push(ytb.smartHash);
+
+        const sentiment = await SentimentAnalysis.analyze(ytb.text);
+        // sentiment is bg color, emotion is border color 
+        ytb.element.style.backgroundColor = sentiment.sentiment.label === "POSITIVE" ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)";
+        /**export interface SentimentAnalysisResult {
+           sentiment: {
+       
+               label: "POSITIVE" | "NEGATIVE" | "NEUTRAL";
+               score: number;
+           },
+           emotion: {
+               label:  "joy" | "sadness" | "anger" | "fear" | "surprise" | "disgust" | "love" ;
+               score: number;
+           }
+       } */
+        ytb.element.style.borderWidth = "5px";
+        ytb.element.style.borderStyle = "solid";
+        let SentimentPText = document.createElement("p");
+        switch (sentiment.emotion.label) {
+            case "joy":
+                SentimentPText.innerText = "Joy";
+                ytb.element.style.borderColor = "rgba(255, 255, 0, 0.5)";
+                break;
+            case "sadness":
+                SentimentPText.innerText = "Sadness";
+                ytb.element.style.borderColor = "rgba(0, 0, 255, 0.5)";
+                break;
+            case "anger":
+                SentimentPText.innerText = "Anger";
+                ytb.element.style.borderColor = "rgba(255, 0, 0, 0.5)";
+                break;
+            case "fear":
+                SentimentPText.innerText = "Fear";
+                ytb.element.style.borderColor = "rgba(0, 0, 0, 0.5)";
+                break;
+            case "surprise":
+                SentimentPText.innerText = "Surprise";
+                ytb.element.style.borderColor = "rgba(255, 0, 255, 0.5)";
+                break;
+            case "disgust":
+                SentimentPText.innerText = "Disgust";
+                ytb.element.style.borderColor = "rgba(0, 255, 255, 0.5)";
+                break;
+            case "love":
+                SentimentPText.innerText = "Love";
+                ytb.element.style.borderColor = "rgba(255, 0, 0, 0.5)";
+                break;
+            default:
+                break
+        }
+        SentimentPText.style.textAlign = "center";
+        SentimentPText.style.fontWeight = "bold";
+        SentimentPText.style.fontSize = "20px";
+        SentimentPText.innerText += " - " + sentiment.sentiment.label;
+        ytb.element.appendChild(SentimentPText);
 
 
     }

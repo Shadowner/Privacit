@@ -1,3 +1,5 @@
+import { PageContent } from "../interfaces/ContentData";
+
 const styles = `
 .fact-check-highlight {
   border-bottom: 1px dotted #ff6b6b;
@@ -74,12 +76,12 @@ function showTooltip(highlight: HTMLElement) {
 function hideTooltip() {
     tooltip.classList.remove("visible");
 }
-
 export function wrapTextWithFactCheck(
     element: HTMLElement,
     sentence: string,
     factCheckInfo: FactCheckInfo,
 ) {
+    
     const regex = new RegExp(`\\b${sentence}\\b`, "gi");
     element.innerHTML = element.innerHTML.replace(regex, (match) => {
         const span = document.createElement("span");
@@ -129,4 +131,17 @@ export function injectFactChecker() {
     });
 
     console.log("Fact checker injected");
+}
+
+
+export function FactCheckContent(content: HTMLElement, filterList?: string[]) {
+    const factCheckInfo: FactCheckInfo = {
+        message: "This is a fact check message",
+        link: "https://www.example.com",
+    };
+    
+    for (const sentence of filterList ?? []) {
+
+        wrapTextWithFactCheck(content, sentence, factCheckInfo);
+    }
 }

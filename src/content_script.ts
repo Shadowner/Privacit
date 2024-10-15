@@ -1,28 +1,37 @@
 import { injectFactChecker } from "./core/FactChecker";
+import { BasicModule } from "./Modules/BasicModule";
 import { TwitterModule } from "./Modules/Twitter";
 import { YTBModule } from "./Modules/Youtube";
 
 console.log("Content script is running");
 
+let previousSeen: Set<number> = new Set();
+
 async function extractPageElements() {
 	const toFilter = await chrome.storage.sync.get(["filterList"]);
 
-	// Test If x.com;
-	if (window.location.href.includes("x.com")) {
-		const tweets = TwitterModule.extractElement();
-		TwitterModule.filterTweets(toFilter.filterList, tweets);
-		chrome.runtime.sendMessage({ action: "processedData", data: tweets });
-		return;
-	}
+	// // Test If x.com;
+	// if (window.location.href.includes("x.com")) {
+	// 	const tweets = TwitterModule.extractElement();
+	// 	TwitterModule.filterTweets(toFilter.filterList, tweets);
+	// 	return;
+	// }
 	// test if youtube.com
 	if (window.location.href.includes("youtube.com")) {
-		console.log("youtube.com");
 		const ytbs = YTBModule.extractElement();
-		console.log(ytbs);
 		YTBModule.filterYtbs(toFilter.filterList, ytbs);
-		chrome.runtime.sendMessage({ action: "processedData", data: ytbs });
 		return;
 	}
+
+	const extracted = BasicModule.extractElement();
+
+	const filtered = extracted.filter(pc => !previousSeen.has(pc.smartHash))
+	previousSeen = new Set();
+
+	BasicModule.filterContent(toFilter.filterList, filtered);
+
+	extracted.forEach(pc => previousSeen.add(pc.smartHash))
+
 
 	// Envoyer les données au service worker
 }

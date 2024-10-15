@@ -1,24 +1,28 @@
 // background.js (Service Worker)
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	console.log("Message reçu:", request);
-	if (request.action === "processData") {
-		// Traitement des données reçues
-		const processedData = request.data.map((title: string) =>
-			title.toUpperCase(),
-		);
-		console.log("Titres traités:", processedData);
 
-		// Vous pouvez effectuer d'autres actions ici, comme stocker les données
-		// ou les envoyer à un serveur
-	}
+import { AiServerAction } from "./core/worker/AiServerAction";
+import { MainSocket } from "./core/worker/SocketConnection";
+
+MainSocket.connect().then(async () => {
+	console.log("Connected to the server");
+	const res = await MainSocket.sendMessage<{ type: string }>({ type: "connected" });
+	console.log("Response from server", res);
 });
 
-chrome.runtime.onConnect.addListener((port) => {
-	console.log("Port connecté:", port);
-	port.onMessage.addListener((msg) => {
-		console.log("Message reçu par le port:", msg);
-	});
-	port.postMessage("Message envoyé par le port");
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	console.log("Message DEPUIS CHROME:", request);
+	if (request.type === "sentimentAnalysis") {
+		const analysis = AiServerAction.RequestSentimentAnalysis(request.data).then((res) => {
+			//@ts-ignore
+			sendResponse(res.data);
+		});
+		console.log(analysis)
+		console.log("Sentiment analysis requested");
+	}
+
+	return true;
 });
 
 console.log("Background script is running");
