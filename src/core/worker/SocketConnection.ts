@@ -15,7 +15,7 @@ export class MainSocket {
     private static WaitingForReponses: Record<string, ResolveReject> = {};
     private static MessageQueue: QueuedMessage[] = [];
     private static activeRequests: number = 0;
-    private static readonly MAX_PARALLEL_REQUESTS = 5; // Nombre maximum de requêtes parallèles
+    private static readonly MAX_PARALLEL_REQUESTS = 1; // Nombre maximum de requêtes parallèles
     private static readonly MAX_RETRY_ATTEMPTS = 3; // Nombre maximum de tentatives de renvoi
 
     public static connect() {
@@ -97,7 +97,7 @@ export class MainSocket {
                     this.MessageQueue.push({ ...queuedMessage, retryCount: retryCount + 1 });
                     this.processQueue();
                 }
-            }, 30000); // 10 secondes de timeout
+            }, 150000); // 10 secondes de timeout
 
         } catch (error) {
             console.error("Error while sending message", error);

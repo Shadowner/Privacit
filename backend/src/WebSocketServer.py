@@ -19,14 +19,15 @@ async def echo(websocket):
             print (f"Parsed message: {data}")
             if (data["type"] == "sentimentAnalysis"):
                 sentiment = get_sentiment(data["data"])
-                
                 await websocket.send(json.dumps({"__id": data["__id"], "data": sentiment}))
                 continue
+            
             elif (data["type"] == "rephrase"):
                 rephrased = rephrase(data["data"]["phrase"], data["data"]["constraint"])
                 await websocket.send(json.dumps({"__id": data["__id"], "data": rephrased}))
                 continue
-            elif (data["type"] == "factChecking"):
+            
+            elif (data["type"] == "factCheck"):
                 fact_checked = fact_checking(data["data"])
                 await websocket.send(json.dumps({"__id": data["__id"], "data": fact_checked}))
                 continue

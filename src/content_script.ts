@@ -1,7 +1,5 @@
 import { injectFactChecker } from "./core/FactChecker";
 import { BasicModule } from "./Modules/BasicModule";
-import { TwitterModule } from "./Modules/Twitter";
-import { YTBModule } from "./Modules/Youtube";
 
 console.log("Content script is running");
 
@@ -17,11 +15,7 @@ async function extractPageElements() {
 	// 	return;
 	// }
 	// test if youtube.com
-	if (window.location.href.includes("youtube.com")) {
-		const ytbs = YTBModule.extractElement();
-		YTBModule.filterYtbs(toFilter.filterList, ytbs);
-		return;
-	}
+
 
 	const extracted = BasicModule.extractElement();
 
@@ -31,7 +25,6 @@ async function extractPageElements() {
 	BasicModule.filterContent(toFilter.filterList, filtered);
 
 	extracted.forEach(pc => previousSeen.add(pc.smartHash))
-
 
 	// Envoyer les données au service worker
 }

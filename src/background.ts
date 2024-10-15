@@ -20,6 +20,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		});
 		console.log(analysis)
 		console.log("Sentiment analysis requested");
+		return true;
+	}
+
+	if (request.type === "factCheck") {
+		const analysis = AiServerAction.RequestFactChecking(request.data).then((res) => {
+			//@ts-ignore
+			sendResponse(res.data);
+		});
+		console.log(analysis)
+		console.log("Fact checking requested");
+		return true;
 	}
 
 	return true;

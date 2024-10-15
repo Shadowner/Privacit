@@ -14,14 +14,21 @@ export class BasicModule {
             textSelector: 'div[itemprop="text"]',
             url: "stackoverflow",
             sentimentAnalysis: true,
-            factCheck: true
+            factCheck: false
         },
         {
             parentSelector: 'article[data-testid="tweet"]',
             textSelector: 'div[data-testid="tweetText"]',
             url: "x.com",
             sentimentAnalysis: true,
-            factCheck: true
+            factCheck: false
+        }, 
+        {
+            parentSelector: `div[id='body'].ytd-comment-view-model`,
+            textSelector: '.yt-core-attributed-string.yt-core-attributed-string--white-space-pre-wrap',
+            url: "youtube.com",
+            sentimentAnalysis: true,
+            factCheck: false
         }
     ];
     private static get CurrentSeekContent() {
@@ -36,7 +43,6 @@ export class BasicModule {
             console.log("No content found");
             return [];
         }
-        console.log("Extracting content", content);
 
         const elements = document.querySelectorAll(content.parentSelector);
         if (!elements) {
@@ -58,12 +64,12 @@ export class BasicModule {
 
             const potentialId = content.uniqueIdentifierSelector
                 ? element.querySelector(content.uniqueIdentifierSelector)?.textContent || null : null;
-
             const contentItem: PageContent = {
                 text,
                 element,
                 ariaId: potentialId ?? hashString(text).toString(),
                 smartHash: hashString(text),
+                textElement: textElement as HTMLElement
             };
             contentList.push(contentItem);
         }
@@ -104,7 +110,7 @@ export class BasicModule {
         if (this.CurrentSeekContent?.factCheck != null) {
 
             if (this.CurrentSeekContent.factCheck && textElement instanceof HTMLElement) {
-                FactCheckContent(textElement, filterList);
+                FactCheckContent(element);
             }
         }
 

@@ -18,4 +18,11 @@ export class AiServerAction {
             instructions
         })
     }
+
+    public static async RequestFactChecking(text: string) {
+        return await MainSocket.sendMessage<string>({
+            type: "factCheck",
+            data: text
+        })
+    }
 }

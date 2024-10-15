@@ -1,4 +1,5 @@
 import { PageContent } from "../interfaces/ContentData";
+import { FactCheckingResult } from "../interfaces/FactCheckingResult";
 
 const styles = `
 .fact-check-highlight {
@@ -39,14 +40,9 @@ const styles = `
 }
 `;
 
-export interface FactCheckInfo {
-    message: string;
-    link: string;
-}
-
 export let factCheckerStyle: HTMLStyleElement;
 let tooltip: HTMLDivElement;
-
+let cache: Record<number, FactCheckingResult> = {};
 
 function updateTooltipContent(message: string, link: string) {
     tooltip.innerHTML = `
@@ -78,19 +74,16 @@ function hideTooltip() {
 }
 export function wrapTextWithFactCheck(
     element: HTMLElement,
-    sentence: string,
-    factCheckInfo: FactCheckInfo,
+    factCheckInfo: FactCheckingResult,
 ) {
-    
-    const regex = new RegExp(`\\b${sentence}\\b`, "gi");
-    element.innerHTML = element.innerHTML.replace(regex, (match) => {
-        const span = document.createElement("span");
-        span.className = "fact-check-highlight";
-        span.textContent = match;
-        span.dataset.factCheckMessage = factCheckInfo.message;
-        span.dataset.factCheckLink = factCheckInfo.link;
-        return span.outerHTML;
-    });
+    // Put the span on the whole text
+    const span = document.createElement("span");
+    span.className = "fact-check-highlight";
+    span.textContent = element.textContent || "";
+    span.dataset.factCheckMessage = factCheckInfo.explanation;
+    span.dataset.factCheckLink = `https://google.com/search?q=${factCheckInfo.search_query}`;
+    element.innerHTML = ""; 
+    element.appendChild(span);
 }
 
 
@@ -133,15 +126,32 @@ export function injectFactChecker() {
     console.log("Fact checker injected");
 }
 
-
-export function FactCheckContent(content: HTMLElement, filterList?: string[]) {
-    const factCheckInfo: FactCheckInfo = {
-        message: "This is a fact check message",
-        link: "https://www.example.com",
-    };
-    
-    for (const sentence of filterList ?? []) {
-
-        wrapTextWithFactCheck(content, sentence, factCheckInfo);
+let analysing: Set<number> = new Set();
+export async function FactCheckContent(content: PageContent) {
+    let analysis: FactCheckingResult | undefined | null;
+    if(!cache[content.smartHash]) {
+        if (analysing.has(content.smartHash)) {
+            return;
+        }
+        analysing.add(content.smartHash);
+        analysis = await fact_analyse(content.text);
+        analysing.delete(content.smartHash);
+    } else {
+        analysis = cache[content.smartHash];
     }
+
+    if (!analysis) {
+        return;
+    }
+
+    wrapTextWithFactCheck(content.textElement, analysis);
+}
+
+function fact_analyse(text: string): Promise<FactCheckingResult | undefined | null> {
+    return new Promise((res) => {
+        chrome.runtime.sendMessage({ type: "factCheck", data: text }, async (response) => {
+            console.log("Response from chrome", response);
+            res(JSON.parse(response));
+        });
+    });
 }

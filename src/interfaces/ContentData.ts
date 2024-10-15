@@ -4,4 +4,5 @@ export interface PageContent {
 	smartHash: number;
 	text: string;
 	element: HTMLElement;
+	textElement: HTMLElement;
 }
