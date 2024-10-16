@@ -33,6 +33,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		return true;
 	}
 
+	if (request.type === "rephrase") {
+		const analysis = AiServerAction.RequestRephrase(request.data.phrase, request.data.constraint).then((res) => {
+			//@ts-ignore
+			sendResponse(res.data);
+		});
+		console.log(analysis)
+		console.log("Rephrasing requested");
+		return true;
+	}
+
 	return true;
 });
 

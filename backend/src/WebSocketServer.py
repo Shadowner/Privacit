@@ -23,7 +23,7 @@ async def handle_message(websocket, message):
             await websocket.send(json.dumps({"__id": data["__id"], "data": sentiment}))
 
         elif data["type"] == "rephrase":
-            rephrased = rephrase(data["data"]["phrase"], data["data"]["constraint"])
+            rephrased = rephrase(data["data"], data["instructions"])
             await websocket.send(json.dumps({"__id": data["__id"], "data": rephrased}))
 
         elif data["type"] == "factCheck":

@@ -6,6 +6,7 @@ export class SentimentAnalysis {
     private static processing: Set<number> = new Set();
     public static async PageContentSentimentAnalysis(content: PageContent) {
         if (this.processing.has(content.smartHash)) {
+            console
             return;
         }
         this.processing.add(content.smartHash);
@@ -19,10 +20,10 @@ export class SentimentAnalysis {
         console.log(this.cache);
 
         // sentiment is bg color, emotion is border color 
-        content.element.style.backgroundColor = sentiment.sentiment.label === "POSITIVE" ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)";
+        // content.element.style.backgroundColor = sentiment.sentiment.label === "POSITIVE" ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)";
 
-        content.element.style.borderWidth = "5px";
-        content.element.style.borderStyle = "solid";
+        // content.element.style.borderWidth = "5px";
+        // content.element.style.borderStyle = "solid";
         let SentimentPText = document.createElement("p");
         switch (sentiment.emotion.label) {
             case "joy":
@@ -56,10 +57,10 @@ export class SentimentAnalysis {
             default:
                 break
         }
-        SentimentPText.id = "SentimentPText-" + content.smartHash;
-        SentimentPText.style.textAlign = "center";
-        SentimentPText.style.fontWeight = "bold";
-        SentimentPText.style.fontSize = "20px";
+        // SentimentPText.id = "SentimentPText-" + content.smartHash;
+        // SentimentPText.style.textAlign = "center";
+        // SentimentPText.style.fontWeight = "bold";
+        SentimentPText.style.fontSize = "15px";
         SentimentPText.innerText += " - " + sentiment.sentiment.label;
         content.element.appendChild(SentimentPText);
         this.processing.delete(content.smartHash);

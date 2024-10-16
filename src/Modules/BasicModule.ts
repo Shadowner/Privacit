@@ -4,6 +4,7 @@ import { hashString } from "../helper/hashString";
 import { addToAd } from "../core/AdBlocker";
 import { FactCheckContent, wrapTextWithFactCheck } from "../core/FactChecker";
 import { SentimentAnalysis } from "../core/SentimentAnalysis";
+import { Rephraser } from "../core/Rephraser";
 
 
 
@@ -21,14 +22,16 @@ export class BasicModule {
             textSelector: 'div[data-testid="tweetText"]',
             url: "x.com",
             sentimentAnalysis: true,
-            factCheck: true
-        }, 
+            factCheck: true,
+            rephrase: true
+        },
         {
             parentSelector: `div[id='body'].ytd-comment-view-model`,
             textSelector: '.yt-core-attributed-string.yt-core-attributed-string--white-space-pre-wrap',
             url: "youtube.com",
             sentimentAnalysis: true,
-            factCheck: false
+            factCheck: false,
+            rephrase: true
         }
     ];
     private static get CurrentSeekContent() {
@@ -107,6 +110,16 @@ export class BasicModule {
             }
         }
 
+        if (this.CurrentSeekContent?.rephrase != null && this.CurrentSeekContent.rephrase) {
+            // If include any filterList, rephrase the content
+            for (const filter of filterList) {
+                if (element.text.toLowerCase().includes(filter.toLowerCase())) {
+                    Rephraser.rephraseContent(element, filterList);
+                    return;
+                }
+            }
+        }
+
         if (this.CurrentSeekContent?.factCheck != null) {
 
             if (this.CurrentSeekContent.factCheck && textElement instanceof HTMLElement) {
@@ -120,7 +133,7 @@ export class BasicModule {
                 SentimentAnalysis.PageContentSentimentAnalysis(element);
             }
         }
-        
+
     }
 
 }

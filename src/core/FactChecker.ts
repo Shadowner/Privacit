@@ -3,7 +3,7 @@ import { FactCheckingResult } from "../interfaces/FactCheckingResult";
 
 const styles = `
 .fact-check-highlight {
-  border-bottom: 1px dotted #ff6b6b;
+  border-bottom: 1px dotted #fcba03;
   position: relative;
   cursor: help;
 }

@@ -42,7 +42,7 @@ messages = [
 
 def rephrase(phrase, constraint):
     new_messages = rephrase_messages.copy()
-    rephrase_messages[-1]["content"] = new_messages[-1]["content"] + "PHRASE: " + phrase + "\nCONTRAINTE: " + constraint
+    rephrase_messages[-1]["content"] = "PHRASE: " + phrase + "\nCONTRAINTE: " + ",".join(constraint)
     # print(new_messages, phrase, constraint)
     outputs = pipe(new_messages, max_new_tokens=512)
     return outputs[0]["generated_text"][-1]["content"]

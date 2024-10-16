@@ -2,30 +2,40 @@ import { PageContent } from "../interfaces/ContentData";
 
 export class Rephraser {
     private static hashOriginal: Record<number, string> = {};
+    private static processing: Set<number> = new Set();
+    private static cache: Record<number, string> = {};
 
-    public static async rephrase(text: string): Promise<string> {
-
-        return text;
+    public static async rephrase(text: string, constraint: string[]): Promise<string> {
+        return new Promise((res) => {
+            chrome.runtime.sendMessage({ type: "rephrase", data: { phrase: text, constraint } }, async (response) => {
+                console.log("Response from chrome - Rephrase : ", response);
+                res(response);
+            });
+        });
     }
 
-    public static async rephraseElement(element: HTMLElement) {
-        if (element instanceof HTMLElement) {
-            element.innerHTML = await this.rephrase(element.innerHTML);
+    public static async rephraseContent(content: PageContent, filterList: string[]) {
+        if (this.processing.has(content.smartHash)) {
+            return;
         }
-    }
+        this.processing.add(content.smartHash);
 
-    public static rephraseElements(elements: HTMLElement[]): void {
-        elements.forEach((element) => this.rephraseElement(element));
-    }
+        if (this.cache[content.smartHash]) {
+            content.text = this.cache[content.smartHash];
+            content.textElement.innerHTML = content.text;
+            content.textElement.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+            this.processing.delete(content.smartHash);
+            return;
+        }
 
-    public static rephraseAll(): void {
-        const elements = document.querySelectorAll("body *");
-        this.rephraseElements(Array.from(elements) as HTMLElement[]);
-    }
-
-    public static rephraseContent(content: PageContent): void {
         this.hashOriginal[content.smartHash] = content.text;
-        this.rephraseElement(content.element);
+        const rephrased = await this.rephrase(content.text, filterList);
+        console.log("Rephrased : ", rephrased);
+        this.cache[content.smartHash] = rephrased;
+        content.textElement.innerHTML = rephrased;
+        content.textElement.style.backgroundColor = "rgba(0, 255, 0, 0.2)";
+        content.textElement.title = "Original : " + content.text;
+        this.processing.delete(content.smartHash);
     }
 
     public static GetOriginalText(hash: number): string {
