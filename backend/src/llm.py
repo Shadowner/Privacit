@@ -3,7 +3,7 @@ import json
 from transformers import pipeline
 
 #model_id = "meta-llama/Llama-3.1-8B-Instruct"
-model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+model_id = "meta-llama/Llama-3.2-1B-Instruct"
 pipe = pipeline(
     "text-generation",
     model=model_id,
@@ -24,13 +24,19 @@ rephrase_messages = [
 ]
 
 messages = [
-    {"role": "system", "content": "Analysez le texte pour identifier les affirmations factuelles spécifiques qui pourraient nécessiter une vérification. Retournez un JSON contenant : 1) le fait spécifique à vérifier, 2) une explication courte de pourquoi une vérification est nécessaire, 3) un niveau de confiance de 1 à 5 (5 étant le plus susceptible d'être trompeur ou nécessitant une vérification urgente), et 4) une phrase de recherche Google pertinente pour vérifier l'information. Format : {\"claim\": \"fait spécifique\", \"explanation\": \"raison de la vérification\", \"confidence\": niveau_de_confiance, \"search_query\": \"phrase de recherche Google\"}"},
+    {"role": "system", "content": "Analysez le texte pour identifier les affirmations factuelles spécifiques qui pourraient nécessiter une vérification. Si aucun fait vérifiable n'est présent, ne retournez rien. Sinon, retournez un JSON contenant : 1) le fait spécifique à vérifier, 2) une explication courte de pourquoi une vérification est nécessaire, 3) un niveau de confiance de 1 à 5 (5 étant le plus susceptible d'être trompeur ou nécessitant une vérification urgente), et 4) une phrase de recherche Google pertinente pour vérifier l'information. Format : {\"claim\": \"fait spécifique\", \"explanation\": \"raison de la vérification\", \"confidence\": niveau_de_confiance, \"search_query\": \"phrase de recherche Google\"}"},
     {"role": "user", "content": "Le café est la boisson la plus consommée au monde, devant l'eau."},
     {"role": "assistant", "content": "{\"claim\": \"Le café est la boisson la plus consommée au monde\", \"explanation\": \"Cette affirmation est probablement inexacte car l'eau est généralement considérée comme la boisson la plus consommée.\", \"confidence\": 4, \"search_query\": \"Quelle est la boisson la plus consommée dans le monde statistiques\"}"},
+    {"role": "user", "content": "J'adore le café, c'est vraiment délicieux !"},
+    {"role": "assistant", "content": ""},
     {"role": "user", "content": "La Grande Muraille de Chine est visible depuis l'espace à l'œil nu."},
     {"role": "assistant", "content": "{\"claim\": \"La Grande Muraille de Chine est visible depuis l'espace à l'œil nu\", \"explanation\": \"C'est un mythe répandu. La Grande Muraille n'est généralement pas visible à l'œil nu depuis l'orbite terrestre basse.\", \"confidence\": 5, \"search_query\": \"Est-ce que la Grande Muraille de Chine est réellement visible depuis l'espace\"}"},
+    {"role": "user", "content": "Je pense que je vais aller me promener cet après-midi, le temps a l'air agréable."},
+    {"role": "assistant", "content": ""},
     {"role": "user", "content": "Le National Weather Service a émis près de 90 alertes à la tornade avant l'arrivée de l'ouragan Milton. Mais c'est pas un petit coup de vent qui fera du mal a qui que ce soit"},
     {"role": "assistant", "content": "{\"claim\": \"l'arrivée de l'ouragan Milton\", \"explanation\": \"L'existence et l'arrivée de l'ouragan Milton nécessitent une vérification, car il pourrait s'agir d'une information météorologique importante.\", \"confidence\": 3, \"search_query\": \"Ouragan Milton alertes National Weather Service récentes\"}"},
+    {"role": "user", "content": "Les chats sont vraiment des animaux fascinants, j'aime les observer."},
+    {"role": "assistant", "content": ""},
     {"role": "user", "content": ""},
 ]
 

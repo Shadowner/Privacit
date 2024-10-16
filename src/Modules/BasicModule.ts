@@ -21,7 +21,7 @@ export class BasicModule {
             textSelector: 'div[data-testid="tweetText"]',
             url: "x.com",
             sentimentAnalysis: true,
-            factCheck: false
+            factCheck: true
         }, 
         {
             parentSelector: `div[id='body'].ytd-comment-view-model`,

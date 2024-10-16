@@ -7,5 +7,6 @@ export interface BaseContentSeeking {
     factCheck?: boolean;
     uniqueIdentifierSelector?: string;
     sentimentAnalysis?: boolean;
+    rephrase?: boolean;
     adSeeker?: (content: PageContent) => boolean;
 }

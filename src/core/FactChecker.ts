@@ -130,12 +130,16 @@ let analysing: Set<number> = new Set();
 export async function FactCheckContent(content: PageContent) {
     let analysis: FactCheckingResult | undefined | null;
     if(!cache[content.smartHash]) {
+        console.log("Fact checking cache", cache);
         if (analysing.has(content.smartHash)) {
             return;
         }
         analysing.add(content.smartHash);
         analysis = await fact_analyse(content.text);
         analysing.delete(content.smartHash);
+        if (analysis) {
+            cache[content.smartHash] = analysis;
+        }
     } else {
         analysis = cache[content.smartHash];
     }

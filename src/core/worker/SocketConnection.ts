@@ -15,18 +15,25 @@ export class MainSocket {
     private static WaitingForReponses: Record<string, ResolveReject> = {};
     private static MessageQueue: QueuedMessage[] = [];
     private static activeRequests: number = 0;
-    private static readonly MAX_PARALLEL_REQUESTS = 1; // Nombre maximum de requêtes parallèles
+    private static readonly MAX_PARALLEL_REQUESTS = 3; // Nombre maximum de requêtes parallèles
     private static readonly MAX_RETRY_ATTEMPTS = 3; // Nombre maximum de tentatives de renvoi
-
+    private static connecting: boolean = false;
     public static connect() {
         return new Promise<void>((resolve, reject) => {
-            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-                resolve();
+            if(this.connecting) {
                 return;
             }
-
+            this.connecting = true;
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                resolve();
+                this.connecting = false;
+                return;
+            }
+            this.socket?.close();
+            this.socket = null;
             this.socket = new WebSocket("ws://localhost:8765");
             this.socket.onopen = () => {
+                this.connecting = false;
                 console.log("Connected");
                 resolve();
                 this.processQueue(); // Commencer à traiter la file d'attente après la connexion
