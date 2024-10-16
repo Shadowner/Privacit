@@ -1,70 +1,43 @@
-# Chrome Extension TypeScript Starter
+# Svelte Typescript Chrome Extension Boilerplate
 
-![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
+> Boilerplate for Chrome Extension Svelte Typescript project
 
-Chrome Extension, TypeScript and Visual Studio Code
+## Features
 
-## Prerequisites
+-   [Svelte](https://svelte.dev/)
+-   [TypeScript](https://www.typescriptlang.org/)
+-   [Vite](https://vitejs.dev/)
+-   [CRXJS Vite Plugin](https://github.com/crxjs/chrome-extension-tools/blob/main/packages/vite-plugin/README.md)
+-   [Chrome Extensions Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/)
 
-* [node + npm](https://nodejs.org/) (Current Version)
+## Examples of integrations
 
-## Option
+-   [Tailwind CSS](https://tailwindcss.com/) – is in the [tailwindcss](https://github.com/NekitCorp/chrome-extension-svelte-typescript-boilerplate/tree/tailwindcss) branch
 
-* [Visual Studio Code](https://code.visualstudio.com/)
+## Development
 
-## Includes the following
+```bash
+# install dependencies
+npm i
 
-* TypeScript
-* Webpack
-* React
-* Jest
-* Example Code
-    * Chrome Storage
-    * Options Version 2
-    * content script
-    * count up badge number
-    * background
-
-## Project Structure
-
-* src/typescript: TypeScript source files
-* src/assets: static files
-* dist: Chrome Extension directory
-* dist/js: Generated JavaScript files
-
-## Setup
-
+# build files to `/dist` directory
+# HMR for extension pages and content scripts
+npm run dev
 ```
-npm install
-```
-
-## Import as Visual Studio Code project
-
-...
 
 ## Build
 
-```
-npm run build
-```
-
-## Build in watch mode
-
-### terminal
-
-```
-npm run watch
+```bash
+# build files to `/dist` directory
+$ npm run build
 ```
 
-### Visual Studio Code
+## Load unpacked extensions
 
-Run watch mode.
+[Getting Started Tutorial](https://developer.chrome.com/docs/extensions/mv3/getstarted/)
 
-type `Ctrl + Shift + B`
+1. Open the Extension Management page by navigating to `chrome://extensions`.
+2. Enable Developer Mode by clicking the toggle switch next to `Developer mode`.
+3. Click the `LOAD UNPACKED` button and select the `/dist` directory.
 
-## Load extension to chrome
-
-Load `dist` directory
-
-## Test
-`npx jest` or `npm run test`
+![Example](https://wd.imgix.net/image/BhuKGJaIeLNPW9ehns59NfwqKxF2/vOu7iPbaapkALed96rzN.png?auto=format&w=571)
