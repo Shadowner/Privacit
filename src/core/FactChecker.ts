@@ -38,6 +38,7 @@ const styles = `
 .fact-check-tooltip a:hover {
   text-decoration: underline;
 }
+  
 `;
 
 export let factCheckerStyle: HTMLStyleElement;
@@ -76,6 +77,7 @@ export function wrapTextWithFactCheck(
     element: HTMLElement,
     factCheckInfo: FactCheckingResult,
 ) {
+    injectFactChecker();
     // Put the span on the whole text
     const span = document.createElement("span");
     span.className = "fact-check-highlight";
@@ -88,9 +90,14 @@ export function wrapTextWithFactCheck(
 
 
 export function injectFactChecker() {
+    if (document.getElementById("FactCheckerStyle")) {
+        return;
+    }
+
     // Injecter les styles dans la page
     factCheckerStyle = document.createElement("style");
     factCheckerStyle.textContent = styles;
+    factCheckerStyle.id = "FactCheckerStyle";
     document.head.appendChild(factCheckerStyle);
 
     tooltip = document.createElement("div");

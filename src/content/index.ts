@@ -1,4 +1,5 @@
 import { injectFactChecker } from "../core/FactChecker";
+import { SentimentAnalysis } from "../core/SentimentAnalysis";
 import type { GlobalOptions } from "../interfaces/GlobalOptions";
 import { BasicModule } from "../Modules/BasicModule";
 
@@ -6,11 +7,11 @@ console.log("Content script is running");
 
 let previousSeen: Set<number> = new Set();
 export let options: GlobalOptions = {
-    factCheck: false,
-     filterComportment: "delete"
+    factCheck: true,
+    filterComportment: "rephrase"
 };
 
-export let filterList:string[] = ["enculé"];
+export let filterList: string[] = ["enculé"];
 
 chrome.runtime.sendMessage({ type: "getFilter" }, (response) => {
     console.log("Filter list received", response);
@@ -72,6 +73,7 @@ window.addEventListener("load", () => {
     extractPageElements();
     observeDOM();
     injectFactChecker();
+    SentimentAnalysis.InjectSentimentStyle();
     console.log("Content script is loaded");
 });
 
