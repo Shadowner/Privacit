@@ -40,6 +40,11 @@ messages = [
     {"role": "user", "content": ""},
 ]
 
+chat_messages = [
+    {"role": "system", "content": "Vous êtes un assistant qui aide à la conversation en fournissant des réponses et des informations pertinentes. Répondez aux messages des utilisateurs en fonction du contexte de la conversation."},
+    {"role": "assistant", "content": "Bonjour je suis l'assistant de Privacit, comment puis-je vous aider aujourd'hui ?"},
+]
+
 def rephrase(phrase, constraint):
     new_messages = rephrase_messages.copy()
     rephrase_messages[-1]["content"] = "PHRASE: " + phrase + "\nCONTRAINTE: " + ",".join(constraint)
@@ -54,6 +59,15 @@ def fact_checking(text):
     generated_text =  outputs[0]["generated_text"][-1]["content"]
     # test if the generated text is a valid json
     return generated_text
+
+def tchat(contexts):
+    new_messages = chat_messages.copy()
+    new_messages.extend(contexts)
+    outputs = pipe(new_messages, max_new_tokens=512)
+    generated_text =  outputs[0]["generated_text"]
+    # test if the generated text is a valid json
+    return generated_text
+    
 
 # print(rephrase("Elon Musk est un vrai enculé, il ose créé des machines pour nous remplacer nous HUMAINS !", "enculé"));
 # print(rephrase("Vous êtes tous des ravagés, vous ne pensez qu'à vous remplir les poches !", "ravagés"));

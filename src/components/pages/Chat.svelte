@@ -1,14 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { Tchat } from "../../core/Tchat";
 
   let messages: {text:string, isUser:boolean}[] = [];
   let newMessage = "";
   let isThinking = false;
-
-  // Simule un délai pour la réponse du robot
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
 
   // Ajoute un message de l'utilisateur
   function addUserMessage() {
@@ -22,24 +18,26 @@
   // Ajoute un message du robot
   async function addRobotMessage() {
     isThinking = true;
-    await delay(2000); // Simule un délai de réflexion
-    const robotResponses = [
-      "Je comprends votre point de vue.",
-      "C'est une excellente question.",
-      "Pouvez-vous m'en dire plus ?",
-      "Laissez-moi réfléchir à cela.",
-      "Voici ce que je pense à ce sujet...",
-    ];
-    const randomResponse =
-      robotResponses[Math.floor(Math.random() * robotResponses.length)];
-    messages = [...messages, { text: randomResponse, isUser: false }];
+
+    const response = (await Tchat.postUserMessageToTchatAi(messages[messages.length - 1].text))?.content;
+
+    messages = [...messages, { text: response, isUser: false }];
     isThinking = false;
   }
+  
 
   // Ajoute un message initial du robot au chargement de la page
   onMount(() => {
-    addRobotMessage();
+
+    messages = [
+      {
+        text: "Bonjour, je suis le modèle de Privacit. Comment puis-je vous aider ?",
+        isUser: false,
+      },
+    ];
   });
+
+
 </script>
 
 <div

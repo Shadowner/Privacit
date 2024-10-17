@@ -50,6 +50,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
 
+    if (request.type === "tchat") {
+        const analysis = AiServerAction.RequestTchatAi(request.data).then((res) => {
+            //@ts-ignore
+            sendResponse(res.data);
+        });
+        console.log(analysis)
+        console.log("Tchat AI requested");
+        return true
+    }
+
     if (request.type === "getFilter") {
         sendResponse(filterList);
         return true;

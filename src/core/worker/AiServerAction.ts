@@ -25,5 +25,12 @@ export class AiServerAction {
             data: text
         })
     }
+
+    public static async RequestTchatAi(text: string[]) {
+        return await factRephraserSocket.sendMessage<string>({
+            type: "tchat",
+            data: text
+        })
+    }
 }
 

@@ -29,6 +29,10 @@ async def handle_message(websocket, message):
         elif data["type"] == "factCheck":
             fact_checked = fact_checking(data["data"])
             await websocket.send(json.dumps({"__id": data["__id"], "data": fact_checked}))
+            
+        elif data["type"] == "tchat":
+            tchat = tchat(data["data"])
+            await websocket.send(json.dumps({"__id": data["__id"], "data": tchat}))
 
     except Exception as e:
         print(f"Error handling message: {e}")
