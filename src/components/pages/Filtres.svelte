@@ -1,11 +1,11 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { filterList } from "../../storage";
+  import { filterList, globalOptions } from "../../storage";
 
   let filteredWords: string[] = $filterList;
   let newWord = "";
-  let filterAction = "paraphrase";
-  let factCheckingEnabled = false;
+  let filterAction = $globalOptions.filterAction;
+  let factCheckingEnabled = $globalOptions.factCheckingEnabled;
 
   function addWord() {
     if (newWord.trim() && !filteredWords.includes(newWord.trim())) {
@@ -25,6 +25,23 @@
       addWord();
     }
   }
+
+  function updateSettings() {
+    console.log("bsfdhkqfhdsl :kqsjdq sj qklsjqsjd jqlsdjqskldjqslkdj ldsf hkqbs fkhqb skhjbq ")
+    globalOptions.set({
+      filterAction,
+      factCheckingEnabled,
+    });
+  }
+
+  globalOptions.subscribe((options) => {
+    filterAction = options.filterAction;
+    factCheckingEnabled = options.factCheckingEnabled;
+  });
+
+  $: factCheckingEnabled, updateSettings();
+  $: filterAction, updateSettings();
+
 </script>
 
 <div class="bg-primary-light rounded-lg shadow-md p-6 max-w-2xl mx-auto">

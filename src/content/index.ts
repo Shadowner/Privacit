@@ -7,20 +7,22 @@ console.log("Content script is running");
 
 let previousSeen: Set<number> = new Set();
 export let options: GlobalOptions = {
-    factCheck: true,
-    filterComportment: "rephrase"
+    factCheckingEnabled: true,
+    filterAction: "paraphrase"
 };
 
 export let filterList: string[] = ["enculé"];
 
 chrome.runtime.sendMessage({ type: "getFilter" }, (response) => {
-    console.log("Filter list received", response);
     filterList = response;
+});
+
+chrome.runtime.sendMessage({ type: "getOptions" }, (response) => {
+    options = response;
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "setFilter") {
-        console.log("Filter list received - setFilter", request.data);
         filterList = request.data;
     } else if (request.type === "setOptions") {
         options = request.data;
@@ -74,7 +76,6 @@ window.addEventListener("load", () => {
     observeDOM();
     injectFactChecker();
     SentimentAnalysis.InjectSentimentStyle();
-    console.log("Content script is loaded");
 });
 
 // Exécuter également lors du défilement pour capturer les nouveaux tweets chargés dynamiquement

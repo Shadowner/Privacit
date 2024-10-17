@@ -1,21 +1,22 @@
 <script lang="ts">
-  import Sidebar from './Popup/Sidebar.svelte';
-  import Stats from './Popup/Stats.svelte';
-  import Chat from './pages/Chat.svelte';
-  import Filters from './pages/Filtres.svelte';
-    import Sites from './pages/Sites.svelte';
+  import Sidebar from "./Popup/Sidebar.svelte";
+  import Stats from "./Popup/Stats.svelte";
+  import Chat from "./pages/Chat.svelte";
+  import Filters from "./pages/Filtres.svelte";
+  import Sites from "./pages/Sites.svelte";
+  import Profile from "./pages/Profile.svelte";
 
-  let currentPage = 'Account';
+  let currentPage = "Profile";
 
-  const pages: Record<string,any> = {
-    // Profile,
+  const pages: Record<string, any> = {
+    Profile,
     Chat,
     Stats,
     Filters,
     Sites,
     // VoiceVideo,
     // Appearance,
-    Notification
+    Notification,
   };
 
   function handlePageChange(event: CustomEvent<string>) {

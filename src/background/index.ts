@@ -2,7 +2,7 @@
 
 import { AiServerAction } from "../core/worker/AiServerAction";
 import { MainSocket } from "../core/worker/SocketConnection";
-import { conversation, filterList, globalOptions } from "../storage";
+import { contentSeeking, conversation, filterList, globalOptions } from "../storage";
 export const sentimentalSocket = new MainSocket()
 export const factRephraserSocket = new MainSocket("ws://192.168.1.198:8765")
 sentimentalSocket.connect().then(async () => {
@@ -25,8 +25,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //@ts-ignore
             sendResponse(res.data);
         });
-        console.log(analysis)
-        console.log("Sentiment analysis requested");
         return true;
     }
 
@@ -35,8 +33,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //@ts-ignore
             sendResponse(res.data);
         });
-        console.log(analysis)
-        console.log("Fact checking requested");
         return true;
     }
 
@@ -45,8 +41,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //@ts-ignore
             sendResponse(res.data);
         });
-        console.log(analysis)
-        console.log("Rephrasing requested");
         return true;
     }
 
@@ -55,8 +49,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //@ts-ignore
             sendResponse(res.data);
         });
-        console.log(analysis)
-        console.log("Tchat AI requested");
         return true
     }
 
@@ -69,7 +61,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.type === "getOptions") {
         globalOptions.GetValueFromChromeStorage().then((res) => {
+            console.log("Options From storage - ", res);
             sendResponse(res);
+            chrome.runtime.sendMessage({ type: "setOptions", data: res });
         });
         return true;
     }
@@ -78,7 +72,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         conversation.GetValueFromChromeStorage().then((res) => {
             chrome.runtime.sendMessage({ type: "setConversation", data: res });
         });
+    }
 
+    if (request.type === "getContentSeeking") {
+        contentSeeking.GetValueFromChromeStorage().then((res) => {
+            sendResponse(res);
+            chrome.runtime.sendMessage({ type: "setContentSeeking", data: res });
+        });
+        return true;
     }
 
     return true;
@@ -96,4 +97,22 @@ conversation.subscribe((value) => {
     chrome.runtime.sendMessage({ type: "setConversation", data: value });
 });
 
+contentSeeking.subscribe((value) => {
+    chrome.runtime.sendMessage({ type: "setContentSeeking", data: value });
+});
+
 console.log("Background script is running");
+
+
+/*
+chrome.runtime.sendMessage({ type: "getContentSeeking" }, (response) => {
+    console.log("Content seeking received", response);
+    BasicModule.ToSeekcontent = response;
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "setContentSeeking") {
+        console.log("Content seeking received - setContentSeeking", request.data);
+        BasicModule.ToSeekcontent = request.data;
+    }
+});*/

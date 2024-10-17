@@ -1,10 +1,8 @@
 <script lang="ts">
-    import { count } from "../storage";
     import Options from "./Options.svelte";
 </script>
 
 <div class="overlay">
-    <Options {count} />
 </div>
 
 <style>

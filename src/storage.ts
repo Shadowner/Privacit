@@ -50,13 +50,14 @@ export function persistentStore<T>(key: string, initialValue: T): Writable<T> & 
         if (!Object.hasOwn(result, key)) {
             console.log(`Persistent store: couldn't find key [${key}] in chrome storage. Default to initial value [${initialValue}]`)
         }
+        
         chromeValueQueue.push(value);
         store.set(value);
         watchStore();
         watchChrome();
     });
 
-    //@ts-ignore
+    // @ts-ignore
     store.GetValueFromChromeStorage = () => GetValueFromChromeStorage<T>(key);
     // @ts-ignore   
     return store;
@@ -91,8 +92,8 @@ export const contentSeeking = persistentStore<BaseContentSeeking[]>('contentSeek
 
 
 export const filterList = persistentStore<string[]>("filter", [])
-export const globalOptions = persistentStore<GlobalOptions>("options", {
-    factCheck: false,
-    filterComportment: "delete"
+export const globalOptions = persistentStore<GlobalOptions>("myoptions", {
+    factCheckingEnabled: false,
+    filterAction: "delete"
 });
 export const conversation = persistentStore<TchatAi[]>("conversation", []);
