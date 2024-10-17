@@ -15,15 +15,15 @@ export let filterList: string[] = ["enculé"];
 
 chrome.runtime.sendMessage({ type: "getFilter" }, (response) => {
     console.log("Filter list received", response);
-    // filterList = response;
+    filterList = response;
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "setFilter") {
         console.log("Filter list received - setFilter", request.data);
-        // filterList = request.data;
+        filterList = request.data;
     } else if (request.type === "setOptions") {
-        // options = request.data;
+        options = request.data;
     }
 });
 

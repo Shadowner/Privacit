@@ -1,8 +1,17 @@
 import { writable, type Writable } from 'svelte/store';
 import type { BaseContentSeeking } from './interfaces/BaseContentSeeking';
 import type { GlobalOptions } from './interfaces/GlobalOptions';
+import type { TchatAi } from './interfaces/TchatAi';
 
-export function persistentStore<T>(key: string, initialValue: T): Writable<T> {
+export async function GetValueFromChromeStorage<T>(key: string): Promise<T> {
+    return new Promise((res, rej) => {
+        chrome.storage.sync.get(key, (result) => {
+            res(result[key]);
+        });
+    });
+}
+
+export function persistentStore<T>(key: string, initialValue: T): Writable<T> & { GetValueFromChromeStorage: () => Promise<T> } {
     const store = writable(initialValue);
     // Ensure each value is updated exactly once in store and in chrome storage
     let storeValueQueue: T[] = [];
@@ -47,8 +56,13 @@ export function persistentStore<T>(key: string, initialValue: T): Writable<T> {
         watchChrome();
     });
 
+    //@ts-ignore
+    store.GetValueFromChromeStorage = () => GetValueFromChromeStorage<T>(key);
+    // @ts-ignore   
     return store;
 }
+
+
 
 export const contentSeeking = persistentStore<BaseContentSeeking[]>('contentSeeking', [{
     parentSelector: "div[data-answerid]",
@@ -81,3 +95,4 @@ export const globalOptions = persistentStore<GlobalOptions>("options", {
     factCheck: false,
     filterComportment: "delete"
 });
+export const conversation = persistentStore<TchatAi[]>("conversation", []);
