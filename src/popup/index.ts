@@ -1,5 +1,4 @@
 import Options from "../components/Options.svelte";
-import { count } from "../storage";
 
 // Action popup
 // https://developer.chrome.com/docs/extensions/reference/action/
@@ -10,7 +9,6 @@ function render() {
     if (target) {
         new Options({
             target,
-            props: { count },
         });
     }
 }

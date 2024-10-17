@@ -11,16 +11,20 @@ interface QueuedMessage {
 }
 
 export class MainSocket {
-    private static socket: WebSocket | null = null;
-    private static WaitingForReponses: Record<string, ResolveReject> = {};
-    private static MessageQueue: QueuedMessage[] = [];
-    private static activeRequests: number = 0;
-    private static readonly MAX_PARALLEL_REQUESTS = 3; // Nombre maximum de requêtes parallèles
-    private static readonly MAX_RETRY_ATTEMPTS = 3; // Nombre maximum de tentatives de renvoi
-    private static connecting: boolean = false;
-    public static connect() {
+    private socket: WebSocket | null = null;
+    private WaitingForReponses: Record<string, ResolveReject> = {};
+    private MessageQueue: QueuedMessage[] = [];
+    private activeRequests: number = 0;
+    private readonly MAX_PARALLEL_REQUESTS = 3; // Nombre maximum de requêtes parallèles
+    private readonly MAX_RETRY_ATTEMPTS = 3; // Nombre maximum de tentatives de renvoi
+    private connecting: boolean = false;
+
+    constructor(public url: string = "ws://localhost:8765") {
+    }
+
+    public connect() {
         return new Promise<void>((resolve, reject) => {
-            if(this.connecting) {
+            if (this.connecting) {
                 return;
             }
             this.connecting = true;
@@ -31,7 +35,7 @@ export class MainSocket {
             }
             this.socket?.close();
             this.socket = null;
-            this.socket = new WebSocket("ws://localhost:8765");
+            this.socket = new WebSocket(this.url);
             this.socket.onopen = () => {
                 this.connecting = false;
                 console.log("Connected");
@@ -55,14 +59,14 @@ export class MainSocket {
     }
 
 
-    public static async sendMessage<T extends any>(message: any): Promise<T> {
+    public async sendMessage<T extends any>(message: any): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             this.MessageQueue.push({ message, resolve, reject, retryCount: 0 });
             this.processQueue();
         });
     }
 
-    private static async processQueue() {
+    private async processQueue() {
         if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
             await this.connect();
         }
@@ -78,7 +82,7 @@ export class MainSocket {
         }
     }
 
-    private static async sendQueuedMessage(queuedMessage: QueuedMessage) {
+    private async sendQueuedMessage(queuedMessage: QueuedMessage) {
         const { message, resolve, reject, retryCount } = queuedMessage;
 
         if (retryCount >= this.MAX_RETRY_ATTEMPTS) {
@@ -113,7 +117,7 @@ export class MainSocket {
         }
     }
 
-    public static receiveMessage(message: any) {
+    public receiveMessage(message: any) {
         console.log("Message received", message);
         try {
             const resolveReject = this.WaitingForReponses[message.__id];

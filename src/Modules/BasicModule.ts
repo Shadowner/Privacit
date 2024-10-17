@@ -1,39 +1,16 @@
-import { PageContent } from "../interfaces/ContentData";
-import { BaseContentSeeking } from "../interfaces/BaseContentSeeking";
+import type { PageContent } from "../interfaces/ContentData";
+import type { BaseContentSeeking } from "../interfaces/BaseContentSeeking";
 import { hashString } from "../helper/hashString";
 import { addToAd } from "../core/AdBlocker";
 import { FactCheckContent, wrapTextWithFactCheck } from "../core/FactChecker";
 import { SentimentAnalysis } from "../core/SentimentAnalysis";
 import { Rephraser } from "../core/Rephraser";
-
-
+import { contentSeeking } from "../storage";
+import { filterList, options } from "../content";
 
 export class BasicModule {
-    private static ToSeekcontent: BaseContentSeeking[] = [
-        {
-            parentSelector: "div[data-answerid]",
-            textSelector: 'div[itemprop="text"]',
-            url: "stackoverflow",
-            sentimentAnalysis: true,
-            factCheck: false
-        },
-        {
-            parentSelector: 'article[data-testid="tweet"]',
-            textSelector: 'div[data-testid="tweetText"]',
-            url: "x.com",
-            sentimentAnalysis: true,
-            factCheck: true,
-            rephrase: true
-        },
-        {
-            parentSelector: `div[id='body'].ytd-comment-view-model`,
-            textSelector: '.yt-core-attributed-string.yt-core-attributed-string--white-space-pre-wrap',
-            url: "youtube.com",
-            sentimentAnalysis: true,
-            factCheck: false,
-            rephrase: true
-        }
-    ];
+    public static ToSeekcontent: BaseContentSeeking[] = [];
+
     private static get CurrentSeekContent() {
         return this.ToSeekcontent.find((content) => window.location.href.includes(content.url));
     }
@@ -80,28 +57,16 @@ export class BasicModule {
         return contentList;
     }
 
-    public static filterContent(filterList: string[], content: PageContent[]) {
+    public static filterContent(content: PageContent[]) {
         for (const element of content) {
-            this.filterElement(filterList, element);
+            this.filterElement(element);
         }
     }
 
-    public static filterElement(filterList: string[], element: PageContent) {
+    public static filterElement(element: PageContent) {
 
         const textElement = element.element.querySelector(this.CurrentSeekContent?.textSelector ?? "");
-        if (filterList.length === 0) {
-            console.log("No filter list provided");
-            return;
-        }
 
-        // Futur: Make multiple list and type of filter
-
-        // const filterArray = filterList.split(",");
-        // for (const filter of filterArray) {
-        //     if (element.text.toLowerCase().includes(filter.toLowerCase())) {
-        //         element.element.remove();
-        //     }
-        // }
 
         if (this.CurrentSeekContent?.adSeeker != null) {
             if (this.CurrentSeekContent.adSeeker(element)) {
@@ -110,20 +75,33 @@ export class BasicModule {
             }
         }
 
-        if (this.CurrentSeekContent?.rephrase != null && this.CurrentSeekContent.rephrase) {
-            // If include any filterList, rephrase the content
+        console.log("Filter list is", filterList);
+
+        if (options.filterComportment == "rephrase") {
+
+            if (this.CurrentSeekContent?.rephrase != null && this.CurrentSeekContent.rephrase) {
+                // If include any filterList, rephrase the content
+                for (const filter of filterList) {
+                    if (element.text.toLowerCase().includes(filter.toLowerCase())) {
+                        Rephraser.rephraseContent(element, filterList);
+                        return;
+                    }
+                }
+            }
+        } else if (options.filterComportment == "delete") {
             for (const filter of filterList) {
                 if (element.text.toLowerCase().includes(filter.toLowerCase())) {
-                    Rephraser.rephraseContent(element, filterList);
-                    return;
+                    element.element.remove();
                 }
             }
         }
 
-        if (this.CurrentSeekContent?.factCheck != null) {
+        if (options.factCheck) {
+            if (this.CurrentSeekContent?.factCheck != null) {
 
-            if (this.CurrentSeekContent.factCheck && textElement instanceof HTMLElement) {
-                FactCheckContent(element);
+                if (this.CurrentSeekContent.factCheck && textElement instanceof HTMLElement) {
+                    FactCheckContent(element);
+                }
             }
         }
 
@@ -137,3 +115,7 @@ export class BasicModule {
     }
 
 }
+
+contentSeeking.subscribe((value) => {
+    BasicModule.ToSeekcontent = value;
+});

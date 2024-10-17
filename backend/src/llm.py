@@ -57,4 +57,4 @@ def fact_checking(text):
 
 # print(rephrase("Elon Musk est un vrai enculé, il ose créé des machines pour nous remplacer nous HUMAINS !", "enculé"));
 # print(rephrase("Vous êtes tous des ravagés, vous ne pensez qu'à vous remplir les poches !", "ravagés"));
-print(fact_checking("En 2002, Ce putain de musk fonde le complot SpaceX, un fabricant aérospatial et une société de services voué a nous enculer a sec pour du transport spatial, et il en est le PDG"))
+print(rephrase("En 2002, Ce putain de musk fonde le complot SpaceX, un fabricant aérospatial et une société de services voué a nous enculer a sec pour du transport spatial, et il en est le PDG", ["putain","enculer"]));

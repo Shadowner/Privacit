@@ -1,4 +1,4 @@
-import { PageContent } from "../interfaces/ContentData";
+import type { PageContent } from "../interfaces/ContentData";
 
 
 export function addToAd(element: PageContent){

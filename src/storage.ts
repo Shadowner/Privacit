@@ -1,12 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
+import type { BaseContentSeeking } from './interfaces/BaseContentSeeking';
+import type { GlobalOptions } from './interfaces/GlobalOptions';
 
-/**
- * Creates a persistent Svelte store backed by Chrome's sync storage.
- * @template T The type of the store's value
- * @param key The key to use in Chrome's storage
- * @param initialValue The initial value of the store
- * @returns A writable Svelte store
- */
 export function persistentStore<T>(key: string, initialValue: T): Writable<T> {
     const store = writable(initialValue);
     // Ensure each value is updated exactly once in store and in chrome storage
@@ -55,4 +50,34 @@ export function persistentStore<T>(key: string, initialValue: T): Writable<T> {
     return store;
 }
 
-export const count = persistentStore("count", 10);
+export const contentSeeking = persistentStore<BaseContentSeeking[]>('contentSeeking', [{
+    parentSelector: "div[data-answerid]",
+    textSelector: 'div[itemprop="text"]',
+    url: "stackoverflow",
+    sentimentAnalysis: true,
+    factCheck: false
+},
+{
+    parentSelector: 'article[data-testid="tweet"]',
+    textSelector: 'div[data-testid="tweetText"]',
+    url: "x.com",
+    sentimentAnalysis: true,
+    factCheck: true,
+    rephrase: true
+},
+{
+    parentSelector: `div[id='body'].ytd-comment-view-model`,
+    textSelector: '.yt-core-attributed-string.yt-core-attributed-string--white-space-pre-wrap',
+    url: "youtube.com",
+    sentimentAnalysis: true,
+    factCheck: true,
+    rephrase: true
+}]);
+
+
+
+export const filterList = persistentStore<string[]>("filter", [])
+export const globalOptions = persistentStore<GlobalOptions>("options", {
+    factCheck: false,
+    filterComportment: "delete"
+});

@@ -1,39 +1,32 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { type Writable } from "svelte/store";
+  import Sidebar from './Popup/Sidebar.svelte';
+  import Stats from './Popup/Stats.svelte';
+  import Chat from './pages/Chat.svelte';
+  import Filters from './pages/Filtres.svelte';
+    import Sites from './pages/Sites.svelte';
 
-    export let count: Writable<number>;
+  let currentPage = 'Account';
 
-    onMount(() => {
-        console.log(`Options onMount count=${$count}`);
-    });
+  const pages: Record<string,any> = {
+    // Profile,
+    Chat,
+    Stats,
+    Filters,
+    Sites,
+    // VoiceVideo,
+    // Appearance,
+    Notification
+  };
+
+  function handlePageChange(event: CustomEvent<string>) {
+    console.log(event.detail, currentPage, pages[currentPage]);
+    currentPage = event.detail;
+  }
 </script>
 
-<div class="container">
-    <p>Current count: <b>{$count}</b></p>
-    <div>
-        <button on:click={() => ($count -= 1)}>-</button>
-        <button on:click={() => ($count += 1)}>+</button>
-    </div>
+<div class="flex bg-gray-100 min-h-screen w-full overflow-hidden h-full">
+  <Sidebar on:pageChange={handlePageChange} />
+  <main class="flex-grow p-2">
+    <svelte:component this={pages[currentPage]} />
+  </main>
 </div>
-
-<style>
-    .container {
-        min-width: 250px;
-    }
-
-    button {
-        border-radius: 2px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-        background-color: #2ecc71;
-        color: #ecf0f1;
-        transition: background-color 0.3s;
-        padding: 5px 10px;
-        border: none;
-    }
-
-    button:hover,
-    button:focus {
-        background-color: #27ae60;
-    }
-</style>

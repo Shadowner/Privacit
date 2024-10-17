@@ -1,12 +1,35 @@
 import { injectFactChecker } from "../core/FactChecker";
+import type { GlobalOptions } from "../interfaces/GlobalOptions";
 import { BasicModule } from "../Modules/BasicModule";
 
 console.log("Content script is running");
 
 let previousSeen: Set<number> = new Set();
+export let options: GlobalOptions = {
+    factCheck: false,
+     filterComportment: "delete"
+};
+
+export let filterList:string[] = ["enculé"];
+
+chrome.runtime.sendMessage({ type: "getFilter" }, (response) => {
+    console.log("Filter list received", response);
+    // filterList = response;
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "setFilter") {
+        console.log("Filter list received - setFilter", request.data);
+        // filterList = request.data;
+    } else if (request.type === "setOptions") {
+        // options = request.data;
+    }
+});
+
 
 async function extractPageElements() {
-    const toFilter = ["enculé", "debug"];
+
+
 
     // // Test If x.com;
     // if (window.location.href.includes("x.com")) {
@@ -22,7 +45,7 @@ async function extractPageElements() {
     const filtered = extracted.filter(pc => !previousSeen.has(pc.smartHash))
     previousSeen = new Set();
 
-    BasicModule.filterContent(toFilter, filtered);
+    BasicModule.filterContent(filtered);
 
     extracted.forEach(pc => previousSeen.add(pc.smartHash))
 

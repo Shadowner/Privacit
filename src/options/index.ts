@@ -1,5 +1,4 @@
 import Options from "../components/Options.svelte";
-import { count } from "../storage";
 
 // Options
 // https://developer.chrome.com/docs/extensions/mv3/options/
@@ -10,7 +9,6 @@ function render() {
     if (target) {
         new Options({
             target,
-            props: { count },
         });
     }
 }

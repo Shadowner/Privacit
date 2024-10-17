@@ -1,5 +1,5 @@
-import { PageContent } from "../interfaces/ContentData";
-import { FactCheckingResult } from "../interfaces/FactCheckingResult";
+import type { PageContent } from "../interfaces/ContentData";
+import type { FactCheckingResult } from "../interfaces/FactCheckingResult";
 
 const styles = `
 .fact-check-highlight {
