@@ -2,7 +2,7 @@
 
 import { AiServerAction } from "../core/worker/AiServerAction";
 import { MainSocket } from "../core/worker/SocketConnection";
-import { filterList, globalOptions } from "../storage";
+import { conversation, filterList, globalOptions } from "../storage";
 export const sentimentalSocket = new MainSocket()
 export const factRephraserSocket = new MainSocket("ws://192.168.1.198:8765")
 sentimentalSocket.connect().then(async () => {
@@ -50,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
 
-    if (request.type === "tchat") {
+    if (request.type === "tchatAi") {
         const analysis = AiServerAction.RequestTchatAi(request.data).then((res) => {
             //@ts-ignore
             sendResponse(res.data);
@@ -61,13 +61,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.type === "getFilter") {
-        sendResponse(filterList);
+        filterList.GetValueFromChromeStorage().then((res) => {
+            sendResponse(res);
+        });
         return true;
     }
 
     if (request.type === "getOptions") {
-        sendResponse(globalOptions);
+        globalOptions.GetValueFromChromeStorage().then((res) => {
+            sendResponse(res);
+        });
         return true;
+    }
+
+    if (request.type === "getConversation") {
+        conversation.GetValueFromChromeStorage().then((res) => {
+            chrome.runtime.sendMessage({ type: "setConversation", data: res });
+        });
+
     }
 
     return true;
@@ -79,6 +90,10 @@ filterList.subscribe((value) => {
 
 globalOptions.subscribe((value) => {
     chrome.runtime.sendMessage({ type: "setOptions", data: value });
+});
+
+conversation.subscribe((value) => {
+    chrome.runtime.sendMessage({ type: "setConversation", data: value });
 });
 
 console.log("Background script is running");
