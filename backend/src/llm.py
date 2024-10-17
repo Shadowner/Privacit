@@ -3,7 +3,7 @@ import json
 from transformers import pipeline
 
 #model_id = "meta-llama/Llama-3.1-8B-Instruct"
-model_id = "meta-llama/Llama-3.2-1B-Instruct"
+model_id = "meta-llama/Llama-3.2-3B-Instruct"
 pipe = pipeline(
     "text-generation",
     model=model_id,
@@ -41,7 +41,7 @@ messages = [
 ]
 
 chat_messages = [
-    {"role": "system", "content": "Vous êtes un assistant qui aide à la conversation en fournissant des réponses et des informations pertinentes. Répondez aux messages des utilisateurs en fonction du contexte de la conversation."},
+    {"role": "system", "content": "Vous êtes un assistant qui aide à la conversation en fournissant des réponses et des informations pertinentes. Répondez aux messages des utilisateurs en fonction du contexte de la conversation. Tu ne fournis que des réponses courtes, concises et informatives."},
     {"role": "assistant", "content": "Bonjour je suis l'assistant de Privacit, comment puis-je vous aider aujourd'hui ?"},
 ]
 
@@ -60,11 +60,14 @@ def fact_checking(text):
     # test if the generated text is a valid json
     return generated_text
 
-def tchat(contexts):
+def tchat_with_llm(contexts):
+    print(contexts)
     new_messages = chat_messages.copy()
     new_messages.extend(contexts)
+    print(new_messages)
     outputs = pipe(new_messages, max_new_tokens=512)
-    generated_text =  outputs[0]["generated_text"]
+    print(outputs)
+    generated_text =  outputs[0]["generated_text"][-1]
     # test if the generated text is a valid json
     return generated_text
     

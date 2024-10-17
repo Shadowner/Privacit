@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from llm import rephrase, fact_checking
+from llm import rephrase, fact_checking, tchat_with_llm
 from sentiment_analysis import get_sentiment
 from websockets.asyncio.server import serve
 
@@ -31,7 +31,7 @@ async def handle_message(websocket, message):
             await websocket.send(json.dumps({"__id": data["__id"], "data": fact_checked}))
             
         elif data["type"] == "tchat":
-            tchat = tchat(data["data"])
+            tchat = tchat_with_llm(data["data"])
             await websocket.send(json.dumps({"__id": data["__id"], "data": tchat}))
 
     except Exception as e:
@@ -45,7 +45,7 @@ async def echo(websocket):
         
             
 async def main():
-    async with serve(echo, "localhost", 8765):
+    async with serve(echo, "0.0.0.0", 8765):
         await asyncio.get_running_loop().create_future()  # run forever
 
 asyncio.run(main())
