@@ -4,7 +4,7 @@ import { AiServerAction } from "../core/worker/AiServerAction";
 import { MainSocket } from "../core/worker/SocketConnection";
 import { contentSeeking, conversation, filterList, globalOptions } from "../storage";
 export const sentimentalSocket = new MainSocket()
-export const factRephraserSocket = new MainSocket("ws://192.168.1.198:8765")
+export const factRephraserSocket = new MainSocket()
 sentimentalSocket.connect().then(async () => {
     console.log("Connected to the server");
     const res = await sentimentalSocket.sendMessage<{ type: string }>({ type: "connected" });
@@ -21,6 +21,7 @@ factRephraserSocket.connect().then(async () => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Message DEPUIS CHROME:", request);
     if (request.type === "sentimentAnalysis") {
+        console.log("Sentiment Analysis Requested");
         const analysis = AiServerAction.RequestSentimentAnalysis(request.data).then((res) => {
             //@ts-ignore
             sendResponse(res.data);
@@ -29,6 +30,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.type === "factCheck") {
+        console.log("Fact Checking Request");
         const analysis = AiServerAction.RequestFactChecking(request.data).then((res) => {
             //@ts-ignore
             sendResponse(res.data);
@@ -37,6 +39,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.type === "rephrase") {
+        console.log("Rephrasing Request");
         const analysis = AiServerAction.RequestRephrase(request.data.phrase, request.data.constraint).then((res) => {
             //@ts-ignore
             sendResponse(res.data);
@@ -45,6 +48,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     if (request.type === "tchatAi") {
+        console.log("Tchat Ai Request");
         const analysis = AiServerAction.RequestTchatAi(request.data).then((res) => {
             //@ts-ignore
             sendResponse(res.data);

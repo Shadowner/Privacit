@@ -49,6 +49,7 @@ export function persistentStore<T>(key: string, initialValue: T): Writable<T> & 
         let value = Object.hasOwn(result, key) ? result[key] : initialValue;
         if (!Object.hasOwn(result, key)) {
             console.log(`Persistent store: couldn't find key [${key}] in chrome storage. Default to initial value [${initialValue}]`)
+            chrome.storage.sync.set({ [key]: initialValue });
         }
         
         chromeValueQueue.push(value);

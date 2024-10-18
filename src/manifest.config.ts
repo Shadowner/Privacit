@@ -28,6 +28,16 @@ export default defineManifest(async (env) => ({
             js: ["src/content/index.ts"],
         },
     ],
+    content_security_policy: {
+        //
+        extension_pages: "script-src 'self'; object-src 'self'; script-src-elem 'self'; script-src-attr 'self'",
+        extension_content: "script-src 'self'; object-src 'self'; script-src-elem 'self'; script-src-attr 'self'",
+    },
+    web_accessible_resources: [
+        { extension_ids: ["*"], resources: ["src/content/index.ts"] },
+        // chrome-extension://hobomplananiffhnbkfjdjooghjddbld/
+        
+    ],
     background: {
         service_worker: "src/background/index.ts",
     },

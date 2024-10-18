@@ -5,7 +5,7 @@ import { addToAd } from "../core/AdBlocker";
 import { FactCheckContent, wrapTextWithFactCheck } from "../core/FactChecker";
 import { SentimentAnalysis } from "../core/SentimentAnalysis";
 import { Rephraser } from "../core/Rephraser";
-import { filterList, options } from "../content";
+import { filterList, options } from "../content/index";
 
 export class BasicModule {
     public static ToSeekcontent: BaseContentSeeking[] = [];
@@ -92,9 +92,9 @@ export class BasicModule {
             for (const filter of filterList) {
                 if (element.text.toLowerCase().includes(filter.toLowerCase())) {
                     element.element.remove();
+                    return
                 }
             }
-            return
         }
 
         if (options.factCheckingEnabled) {

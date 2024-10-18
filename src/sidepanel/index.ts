@@ -1,5 +1,4 @@
 import Options from "../components/Options.svelte";
-import { count } from "../storage";
 
 // Side panel
 // https://developer.chrome.com/docs/extensions/reference/sidePanel/
@@ -10,7 +9,6 @@ function render() {
     if (target) {
         new Options({
             target,
-            props: { count },
         });
     }
 }
